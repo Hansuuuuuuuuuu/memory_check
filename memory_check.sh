@@ -1,18 +1,16 @@
 #!/bin/bash
 
 if [ "$#" -ne 6 ]; then
-  echo -e "Usage: \n-c <Critical Threshold> \n-w <Warning Threshold> \n-e <Email>"
-  exit
+	echo -e "Usage: \n-c <Critical Threshold> \n-w <Warning Threshold> \n-e <Email>"
+	exit
 fi
 
-while getopts c:w:e: option
-do
- case "${option}"
- in
- c) critical=${OPTARG};;
- w) warning=${OPTARG};;
- e) email=${OPTARG};;
- esac
+while getopts c:w:e: option; do
+ 	case "${option}" in
+	 	c) critical=${OPTARG};;
+	 	w) warning=${OPTARG};;
+	 	e) email=${OPTARG};;
+ 	esac
 done
 
 if [ "$warning" -gt "$critical" ]; then
@@ -27,6 +25,9 @@ usedmem=$( free | grep Mem: | awk '{ print $3 }')
 usage=$( awk -v var1="$usedmem" -v var2="$totalmem" 'BEGIN {print var1/var2 * 100}' )
 
 if echo $usage $critical | awk '{exit !( $1 >= $2)}'; then
+	top=$( ps aux --sort -rss | head -n10 )
+	echo "$top" | mail -s "subject here" $e
+
 	exit 2
 elif echo $usage $warning | awk '{exit !( $1 >= $2)}'; then
 	exit 1
