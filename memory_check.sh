@@ -25,9 +25,8 @@ usedmem=$( free | grep Mem: | awk '{ print $3 }')
 usage=$( awk -v var1="$usedmem" -v var2="$totalmem" 'BEGIN {print var1/var2 * 100}' )
 
 if echo $usage $critical | awk '{exit !( $1 >= $2)}'; then
-	top=$( ps aux --sort -rss | head -n10 )
-	echo "$top" | mail -s "subject here" $e
-
+	top=$( ps aux --sort -rss  | head -n10 )
+	echo "$top" | mail -s "subject here" $email
 	exit 2
 elif echo $usage $warning | awk '{exit !( $1 >= $2)}'; then
 	exit 1
