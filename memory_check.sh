@@ -25,11 +25,15 @@ usedmem=$( free | grep Mem: | awk '{ print $3 }')
 usage=$( awk -v var1="$usedmem" -v var2="$totalmem" 'BEGIN {print var1/var2 * 100}' )
 
 if echo $usage $critical | awk '{exit !( $1 >= $2)}'; then
-	top=$( ps aux --sort -rss  | head -n10 )
-	echo "$top" | mail -s "subject here" $email
+	top=$( ps ax --sort -rss -o uname,pid,pcpu,pmem,command| head -n10 )
+	subject=$(date "+%Y%m%d %H:%M")
+	subject+=" memory check - critical"
+	echo "$top" | mail -s "$subject" $email
 	exit 2
 elif echo $usage $warning | awk '{exit !( $1 >= $2)}'; then
 	exit 1
 else
 	exit 0
 fi
+
+#YYYYMMDD HH:MM memory check -critical
